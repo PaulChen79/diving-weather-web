@@ -1,0 +1,25 @@
+<html lang='en'>
+	<head>
+		<meta charset='UTF-8' />
+		<meta http-equiv='X-UA-Compatible' content='IE=edge' />
+		<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+		<title>Diving Weather</title>
+		<style>
+			/* Always set the map height explicitly to define the size of the div * element that contains
+			the map. */ #map { height: 100%; } /* Optional: Makes the sample page fill the window. */
+			html, body { height: 100%; margin: 0; padding: 0; }
+		</style>
+	</head>
+	<body>
+		{{{body}}}
+		<script>
+			var map; function initMap() { map = new google.maps.Map(document.getElementById('map'), {
+			center: {lat: 23.546162, lng: 120.6402133}, zoom: 8 }); }
+		</script>
+		<script
+			src='https://maps.googleapis.com/maps/api/js?key={{APIKey}}&callback=initMap'
+			async
+			defer
+		></script>
+	</body>
+</html>
