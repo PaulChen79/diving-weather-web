@@ -290,9 +290,6 @@ async function initMap() {
 				marker.addListener('click', () => {
 					infoWindow.setContent(message)
 					infoWindow.open(map, marker)
-					setTimeout(() => {
-						infoWindow.close()
-					}, 20000)
 				})
 				return marker
 			} catch (error) {
