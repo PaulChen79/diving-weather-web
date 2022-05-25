@@ -254,17 +254,32 @@ async function initMap() {
 				const response = await (await fetch(`/api/v1/weather?location=${location.name}`)).json()
 
 				let message =
-					`<p>日期： ${response[0].time}\n地點： ${response[0].location}\n\n${response[0].tideChanging}\n\n海水溫度： ${response[0].waterTemperature}度\n浪高： ${response[0].waveHeight}米\n浪向： from  ` +
+					`<div style="line-height:5px;font-size:8px;">
+					<p>日期： ${response[0].time}</p><br>
+					<p>地點： ${response[0].location}</p><br>
+					<p>${response[0].tideChanging}</p><br>
+					<p>海水溫度： ${response[0].waterTemperature}度</p><br>
+					<p>浪高： ${response[0].waveHeight}米</p><br>
+					<p>浪向： from  ` +
 					response[0].waveDirection +
-					`\n流速： ${response[0].currentSpeed}米/秒\n流向： from ` +
+					'</p><br>' +
+					`<p>流速： ${response[0].currentSpeed}米/秒</p><br>
+					<p>流向： from ` +
 					response[0].currentDirection +
-					`\n潮差： ${response[0].tideDifference}\n\n` +
-					'雲量： ' +
+					'</p><br>' +
+					`<p>潮差： ${response[0].tideDifference}</p><br>` +
+					'<p>雲量： ' +
 					response[0].cloudCover +
-					`\n氣溫： ${response[0].temperature}度\n濕度： ${response[0].humidity}%\n雨量${response[0].rain}\n${response[0].wind}</p>`
+					'</p><br>' +
+					`<p>氣溫： ${response[0].temperature}度</p><br>
+					<p>濕度： ${response[0].humidity}%</p><br>
+					<p>雨量${response[0].rain}</p><br>
+					<p>${response[0].wind}</p>
+					</div>
+					`
 
 				marker.addListener('mouseover', () => {
-					infoWindow.setContent(message)
+					infoWindow.setContent(location.name)
 					infoWindow.open(map, marker)
 				})
 
@@ -275,6 +290,9 @@ async function initMap() {
 				marker.addListener('click', () => {
 					infoWindow.setContent(message)
 					infoWindow.open(map, marker)
+					setTimeout(() => {
+						infoWindow.close()
+					}, 20000)
 				})
 				return marker
 			} catch (error) {
