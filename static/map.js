@@ -271,6 +271,11 @@ async function initMap() {
 				marker.addListener('mouseout', () => {
 					infoWindow.close()
 				})
+
+				marker.addListener('click', () => {
+					infoWindow.setContent(message)
+					infoWindow.open(map, marker)
+				})
 				return marker
 			} catch (error) {
 				console.log(error)
