@@ -3,6 +3,7 @@ require('./database/config/mongoose')
 const express = require('express')
 const exphbs = require('express-handlebars')
 const routes = require('./routes/index')
+const PORT = process.env.PORT || 3000
 const app = express()
 
 app.engine('hbs', exphbs.engine({ defaultLayout: 'main', extname: '.hbs' }))
@@ -12,6 +13,6 @@ app.use('/static', express.static('./static/'))
 
 app.use(routes)
 
-app.listen(3000, () => {
-	console.log('App running on port 3000')
+app.listen(PORT, () => {
+	console.log(`App running on port ${PORT}`)
 })
