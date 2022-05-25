@@ -10,14 +10,11 @@
 	</head>
 	<body>
 		{{{body}}}
-		<script>
-			var map; function initMap() { map = new google.maps.Map(document.getElementById('map'), {
-			center: {lat: 23.546162, lng: 120.6402133}, zoom: 8 }); }
-		</script>
 		<script
 			src='https://maps.googleapis.com/maps/api/js?key={{APIKey}}&callback=initMap'
 			async
 			defer
 		></script>
+		<script src='/static/map.js'></script>
 	</body>
 </html>
