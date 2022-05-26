@@ -277,7 +277,7 @@ async function initMap() {
 				marker.addListener('click', async () => {
 					if (markerInfo.classList.contains('hidden')) {
 						cardCategories.dataset.location = location.name
-						message = '<h4 class="text-center">請選擇你想要查詢的類別</h4>'
+						message = '<div class="my-5"><h4 class="text-center">請選擇你想要查詢的類別</h4></div>'
 						infoMessage.innerHTML = message
 						markerInfo.classList.remove('hidden')
 						return
