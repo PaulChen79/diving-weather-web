@@ -228,6 +228,9 @@ const locations = [
 		lat: 22.325
 	}
 ]
+const markerInfo = document.querySelector('#info')
+const infoMessage = document.querySelector('#info-message')
+
 let currentPosition
 async function initMap() {
 	// Map options
@@ -288,9 +291,14 @@ async function initMap() {
 				})
 
 				marker.addListener('click', () => {
-					infoWindow.setContent(message)
-					infoWindow.open(map, marker)
+					if (markerInfo.classList.contains('hidden')) {
+						infoMessage.innerHTML = message
+						markerInfo.classList.remove('hidden')
+						return
+					}
+					markerInfo.classList.add('hidden')
 				})
+
 				return marker
 			} catch (error) {
 				console.log(error)
