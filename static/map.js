@@ -230,6 +230,7 @@ const locations = [
 ]
 const markerInfo = document.querySelector('#info')
 const infoMessage = document.querySelector('#info-message')
+const infoCloseBtn = document.querySelector('#info-close')
 
 let currentPosition
 async function initMap() {
@@ -257,10 +258,11 @@ async function initMap() {
 				const response = await (await fetch(`/api/v1/weather?location=${location.name}`)).json()
 
 				let message =
-					`<div style="line-height:5px;font-size:8px;">
+					`<div style="line-height:15px;font-size:10px; height:60vh;" class="overflow-auto">
 					<p>日期： ${response[0].time}</p><br>
 					<p>地點： ${response[0].location}</p><br>
-					<p>${response[0].tideChanging}</p><br>
+					<p>當日潮汐變化：</p><br>
+					${response[0].tideChanging.substring(7)}</p><br>
 					<p>海水溫度： ${response[0].waterTemperature}度</p><br>
 					<p>浪高： ${response[0].waveHeight}米</p><br>
 					<p>浪向： from  ` +
@@ -305,6 +307,10 @@ async function initMap() {
 			}
 		})
 	)
+
+	infoCloseBtn.addEventListener('click', () => {
+		markerInfo.classList.add('hidden')
+	})
 
 	// Add a marker clusterer to manage the markers.
 	new markerClusterer.MarkerClusterer({ markers, map })
