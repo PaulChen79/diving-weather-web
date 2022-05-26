@@ -231,8 +231,14 @@ const locations = [
 const markerInfo = document.querySelector('#info')
 const infoMessage = document.querySelector('#info-message')
 const infoCloseBtn = document.querySelector('#info-close')
+const cardCategories = document.querySelector('#categories')
+const weatherTabBtn = document.querySelector('#weather-btn')
+const tideTabBtn = document.querySelector('#tide-btn')
+const seaTabBtn = document.querySelector('#sea-btn')
 
+let message = ''
 let currentPosition
+
 async function initMap() {
 	// Map options
 	var options = {
@@ -248,6 +254,8 @@ async function initMap() {
 		content: '',
 		disableAutoPan: true
 	})
+
+	// Fetching markers and info
 	const markers = await Promise.all(
 		locations.map(async location => {
 			try {
@@ -255,32 +263,7 @@ async function initMap() {
 					position: { lat: location.lat, lng: location.lon }
 				})
 
-				const response = await (await fetch(`/api/v1/weather?location=${location.name}`)).json()
-
-				let message =
-					`<p>日期： ${response[0].time}</p><br>
-					<p>地點： ${response[0].location}</p><br>
-					<p>當日潮汐變化：</p><br>
-					${response[0].tideChanging.substring(7)}</p><br>
-					<p>海水溫度： ${response[0].waterTemperature}度</p><br>
-					<p>浪高： ${response[0].waveHeight}米</p><br>
-					<p>浪向： from  ` +
-					response[0].waveDirection +
-					'</p><br>' +
-					`<p>流速： ${response[0].currentSpeed}米/秒</p><br>
-					<p>流向： from ` +
-					response[0].currentDirection +
-					'</p><br>' +
-					`<p>潮差： ${response[0].tideDifference}</p><br>` +
-					'<p>雲量： ' +
-					response[0].cloudCover +
-					'</p><br>' +
-					`<p>氣溫： ${response[0].temperature}度</p><br>
-					<p>濕度： ${response[0].humidity}%</p><br>
-					<p>雨量${response[0].rain}</p><br>
-					<p>${response[0].wind}</p>
-					`
-
+				// mouse over marker to show location name
 				marker.addListener('mouseover', () => {
 					infoWindow.setContent(location.name)
 					infoWindow.open(map, marker)
@@ -290,9 +273,11 @@ async function initMap() {
 					infoWindow.close()
 				})
 
-				marker.addListener('click', () => {
+				// Open info tab
+				marker.addListener('click', async () => {
 					if (markerInfo.classList.contains('hidden')) {
 						infoMessage.innerHTML = message
+						cardCategories.dataset.location = location.name
 						markerInfo.classList.remove('hidden')
 						return
 					}
@@ -306,12 +291,55 @@ async function initMap() {
 		})
 	)
 
-	infoCloseBtn.addEventListener('click', () => {
-		markerInfo.classList.add('hidden')
-	})
-
 	// Add a marker clusterer to manage the markers.
 	new markerClusterer.MarkerClusterer({ markers, map })
+
+	weatherTabBtn.addEventListener('click', async event => {
+		const location = event.target.parentNode.parentNode.parentNode.dataset.location
+		const response = await (await fetch(`/api/v1/weather?location=${location}`)).json()
+		message =
+			`
+		<p>日期： ${response[0].time}</p><br>
+		<p>地點： ${response[0].location}</p><br>` +
+			'<p>雲量： ' +
+			response[0].cloudCover +
+			'</p><br>' +
+			`<p>氣溫： ${response[0].temperature}度</p><br>
+		<p>濕度： ${response[0].humidity}%</p><br>
+		<p>雨量${response[0].rain}</p><br>
+		<p>${response[0].wind}</p>`
+		infoMessage.innerHTML = message
+	})
+
+	tideTabBtn.addEventListener('click', async event => {
+		const location = event.target.parentNode.parentNode.parentNode.dataset.location
+		const response = await (await fetch(`/api/v1/weather?location=${location}`)).json()
+		message = `
+		<p>日期： ${response[0].time}</p><br>
+		<p>地點： ${response[0].location}</p><br>
+		<p>潮差： ${response[0].tideDifference}</p><br>
+		<p>當日潮汐變化：</p><br>${response[0].tideChanging.substring(7)}</p><br>
+		`
+		infoMessage.innerHTML = message
+	})
+
+	seaTabBtn.addEventListener('click', async event => {
+		const location = event.target.parentNode.parentNode.parentNode.dataset.location
+		const response = await (await fetch(`/api/v1/weather?location=${location}`)).json()
+		message =
+			`
+		<p>日期： ${response[0].time}</p><br>
+		<p>地點： ${response[0].location}</p><br>
+		<p>海水溫度： ${response[0].waterTemperature}度</p><br>
+		<p>浪高： ${response[0].waveHeight}米</p><br>` +
+			'<p>浪向： from ' +
+			response[0].waveDirection +
+			'</p><br>' +
+			'<p>流向： from ' +
+			response[0].currentDirection +
+			'</p><br>'
+		infoMessage.innerHTML = message
+	})
 
 	// Set user location to center
 	navigator.geolocation.getCurrentPosition(function (position) {
@@ -321,5 +349,10 @@ async function initMap() {
 		}
 		map.setCenter(currentPosition)
 		map.setZoom(11)
+	})
+
+	// Close tab by close btn
+	infoCloseBtn.addEventListener('click', () => {
+		markerInfo.classList.add('hidden')
 	})
 }
