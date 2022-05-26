@@ -276,8 +276,9 @@ async function initMap() {
 				// Open info tab
 				marker.addListener('click', async () => {
 					if (markerInfo.classList.contains('hidden')) {
-						infoMessage.innerHTML = message
 						cardCategories.dataset.location = location.name
+						message = '<h4 class="text-center">請選擇你想要查詢的類別</h4>'
+						infoMessage.innerHTML = message
 						markerInfo.classList.remove('hidden')
 						return
 					}
@@ -303,31 +304,31 @@ async function initMap() {
 		if (event.target.id === 'weather-btn') {
 			message =
 				`
-		<p>日期： ${response[0].time}</p><br>
-		<p>地點： ${response[0].location}</p><br>` +
+				<p>日期： ${response[0].time}</p><br>
+				<p>地點： ${response[0].location}</p><br>` +
 				'<p>雲量： ' +
 				response[0].cloudCover +
 				'</p><br>' +
 				`<p>氣溫： ${response[0].temperature}度</p><br>
-		<p>濕度： ${response[0].humidity}%</p><br>
-		<p>雨量${response[0].rain}</p><br>
-		<p>${response[0].wind}</p>`
+				<p>濕度： ${response[0].humidity}%</p><br>
+				<p>雨量${response[0].rain}</p><br>
+				<p>${response[0].wind}</p>`
 			infoMessage.innerHTML = message
 		} else if (event.target.id === 'tide-btn') {
 			message = `
-		<p>日期： ${response[0].time}</p><br>
-		<p>地點： ${response[0].location}</p><br>
-		<p>潮差： ${response[0].tideDifference}</p><br>
-		<p>當日潮汐變化：</p><br>${response[0].tideChanging.substring(7)}</p><br>
-		`
+				<p>日期： ${response[0].time}</p><br>
+				<p>地點： ${response[0].location}</p><br>
+				<p>潮差： ${response[0].tideDifference}</p><br>
+				<p>當日潮汐變化：</p><br>${response[0].tideChanging.substring(7)}</p><br>
+				`
 			infoMessage.innerHTML = message
 		} else if (event.target.id === 'sea-btn') {
 			message =
 				`
-		<p>日期： ${response[0].time}</p><br>
-		<p>地點： ${response[0].location}</p><br>
-		<p>海水溫度： ${response[0].waterTemperature}度</p><br>
-		<p>浪高： ${response[0].waveHeight}米</p><br>` +
+				<p>日期： ${response[0].time}</p><br>
+				<p>地點： ${response[0].location}</p><br>
+				<p>海水溫度： ${response[0].waterTemperature}度</p><br>
+				<p>浪高： ${response[0].waveHeight}米</p><br>` +
 				'<p>浪向： from ' +
 				response[0].waveDirection +
 				'</p><br>' +
