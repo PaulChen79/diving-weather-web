@@ -281,6 +281,8 @@ async function initMap() {
 						markerInfo.classList.remove('hidden')
 						return
 					}
+					message = ''
+					infoMessage.innerHTML = message
 					markerInfo.classList.add('hidden')
 				})
 
@@ -294,51 +296,53 @@ async function initMap() {
 	// Add a marker clusterer to manage the markers.
 	new markerClusterer.MarkerClusterer({ markers, map })
 
-	weatherTabBtn.addEventListener('click', async event => {
-		const location = event.target.parentNode.parentNode.parentNode.dataset.location
+	cardCategories.addEventListener('click', async event => {
+		const location = cardCategories.dataset.location
 		const response = await (await fetch(`/api/v1/weather?location=${location}`)).json()
-		message =
-			`
+
+		if (event.target.id === 'weather-btn') {
+			message =
+				`
 		<p>日期： ${response[0].time}</p><br>
 		<p>地點： ${response[0].location}</p><br>` +
-			'<p>雲量： ' +
-			response[0].cloudCover +
-			'</p><br>' +
-			`<p>氣溫： ${response[0].temperature}度</p><br>
+				'<p>雲量： ' +
+				response[0].cloudCover +
+				'</p><br>' +
+				`<p>氣溫： ${response[0].temperature}度</p><br>
 		<p>濕度： ${response[0].humidity}%</p><br>
 		<p>雨量${response[0].rain}</p><br>
 		<p>${response[0].wind}</p>`
-		infoMessage.innerHTML = message
-	})
-
-	tideTabBtn.addEventListener('click', async event => {
-		const location = event.target.parentNode.parentNode.parentNode.dataset.location
-		const response = await (await fetch(`/api/v1/weather?location=${location}`)).json()
-		message = `
+			infoMessage.innerHTML = message
+		} else if (event.target.id === 'tide-btn') {
+			message = `
 		<p>日期： ${response[0].time}</p><br>
 		<p>地點： ${response[0].location}</p><br>
 		<p>潮差： ${response[0].tideDifference}</p><br>
 		<p>當日潮汐變化：</p><br>${response[0].tideChanging.substring(7)}</p><br>
 		`
-		infoMessage.innerHTML = message
-	})
-
-	seaTabBtn.addEventListener('click', async event => {
-		const location = event.target.parentNode.parentNode.parentNode.dataset.location
-		const response = await (await fetch(`/api/v1/weather?location=${location}`)).json()
-		message =
-			`
+			infoMessage.innerHTML = message
+		} else if (event.target.id === 'sea-btn') {
+			message =
+				`
 		<p>日期： ${response[0].time}</p><br>
 		<p>地點： ${response[0].location}</p><br>
 		<p>海水溫度： ${response[0].waterTemperature}度</p><br>
 		<p>浪高： ${response[0].waveHeight}米</p><br>` +
-			'<p>浪向： from ' +
-			response[0].waveDirection +
-			'</p><br>' +
-			'<p>流向： from ' +
-			response[0].currentDirection +
-			'</p><br>'
+				'<p>浪向： from ' +
+				response[0].waveDirection +
+				'</p><br>' +
+				'<p>流向： from ' +
+				response[0].currentDirection +
+				'</p><br>'
+			infoMessage.innerHTML = message
+		}
+	})
+
+	// Close tab by close btn
+	infoCloseBtn.addEventListener('click', () => {
+		message = ''
 		infoMessage.innerHTML = message
+		markerInfo.classList.add('hidden')
 	})
 
 	// Set user location to center
@@ -349,10 +353,5 @@ async function initMap() {
 		}
 		map.setCenter(currentPosition)
 		map.setZoom(11)
-	})
-
-	// Close tab by close btn
-	infoCloseBtn.addEventListener('click', () => {
-		markerInfo.classList.add('hidden')
 	})
 }
