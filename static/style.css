@@ -1,3 +1,7 @@
 .card.hidden {
 	display: none;
 }
+
+.card {
+	max-height: 35vh;
+}

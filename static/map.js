@@ -258,8 +258,7 @@ async function initMap() {
 				const response = await (await fetch(`/api/v1/weather?location=${location.name}`)).json()
 
 				let message =
-					`<div style="line-height:15px;font-size:10px; height:60vh;" class="overflow-auto">
-					<p>日期： ${response[0].time}</p><br>
+					`<p>日期： ${response[0].time}</p><br>
 					<p>地點： ${response[0].location}</p><br>
 					<p>當日潮汐變化：</p><br>
 					${response[0].tideChanging.substring(7)}</p><br>
@@ -280,7 +279,6 @@ async function initMap() {
 					<p>濕度： ${response[0].humidity}%</p><br>
 					<p>雨量${response[0].rain}</p><br>
 					<p>${response[0].wind}</p>
-					</div>
 					`
 
 				marker.addListener('mouseover', () => {
