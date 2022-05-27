@@ -299,86 +299,8 @@ async function initMap() {
 		const response = await (await fetch(`/api/v1/weather?location=${location}`)).json()
 
 		if (event.target.id === 'weather-btn') {
-			message =
-				`
-				<p>日期： ${response[0].time}</p><br>
-				<p>地點： ${response[0].location}</p><br>` +
-				'<p>雲量： ' +
-				response[0].cloudCover +
-				'</p><br>' +
-				`<p>氣溫： ${response[0].temperature}度</p><br>
-				<p>濕度： ${response[0].humidity}%</p><br>
-				<p>雨量${response[0].rain}</p><br>
-				<p>${response[0].wind}</p>`
-			infoMessage.innerHTML = message
 		} else if (event.target.id === 'tide-btn') {
-			const tideChartDOM = document.createElement('CANVAS')
-			tideChartDOM.id = 'tide-chart'
-			tideChartDOM.width = '100vw'
-			tideChartDOM.height = '30vh'
-			await new Chart(tideChartDOM, {
-				type: 'line',
-				data: {
-					labels: [
-						response[0].tideChanging.substring(8, 13),
-						response[0].tideChanging.substring(19, 24),
-						response[0].tideChanging.substring(30, 35),
-						response[0].tideChanging.substring(41, 46)
-					],
-					datasets: [
-						{
-							data: [100, 0, 100, 0],
-							borderColor: '#3e95cd',
-							fill: false,
-							lineTension: 0.4
-						}
-					]
-				},
-				options: {
-					plugins: {
-						legend: {
-							display: false
-						}
-					},
-					scales: {
-						x: {
-							grid: {
-								display: false
-							}
-						},
-						y: {
-							grid: {
-								display: false
-							},
-							ticks: {
-								display: false
-							}
-						}
-					}
-				}
-			})
-			message = `
-				<p>日期： ${response[0].time}</p><br>
-				<p>地點： ${response[0].location}</p><br>
-				<p>潮差： ${response[0].tideDifference}</p><br>
-				<p>當日潮汐變化：</p><br>`
-
-			infoMessage.innerHTML = message
-			infoMessage.appendChild(tideChartDOM)
 		} else if (event.target.id === 'sea-btn') {
-			message =
-				`
-				<p>日期： ${response[0].time}</p><br>
-				<p>地點： ${response[0].location}</p><br>
-				<p>海水溫度： ${response[0].waterTemperature}度</p><br>
-				<p>浪高： ${response[0].waveHeight}米</p><br>` +
-				'<p>浪向： from ' +
-				response[0].waveDirection +
-				'</p><br>' +
-				'<p>流向： from ' +
-				response[0].currentDirection +
-				'</p><br>'
-			infoMessage.innerHTML = message
 		}
 	})
 

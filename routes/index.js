@@ -9,8 +9,8 @@ router.get('/', (req, res) => {
 
 router.get('/api/v1/weather', async (req, res) => {
 	try {
-		const location = req.query.location
-		const weather = await Weather.find({ location }).lean()
+		const location = new RegExp(req.query.location)
+		const weather = await Weather.find({ location: { $regex: location } }).lean()
 		res.json(weather)
 	} catch (error) {
 		console.log(error)

@@ -1,72 +1,62 @@
 require('dotenv').config()
 const db = require('../config/mongoose')
-const { genResult } = require('../utils/utils')
-const locations = require('../locations.json')
+const locations = require('./locations.json')
 const Weather = require('../models/weather')
-const axios = require('axios')
+const fetch = require('node-fetch')
+const queryString = require('query-string')
+const moment = require('moment')
+const getTimelineURL = 'https://api.tomorrow.io/v4/timelines'
+const apikey = process.env.TOMORROW_API_KEY
 
-db.once('open', () => {
-	return Promise.all(
-		Array.from(locations, location => {
-			const locationName = location.alias
-			const LocationLon = location.lon
-			const locationLat = location.lat
-			const timeNow = new Date(Date.now()).toISOString()
-			const timeNextHr = new Date(Date.now() + 3600000).toISOString()
-			const today = new Date(Date.now()).toISOString().substring(0, 10) + 'T00:00:00'
-			const nextDay = new Date(Date.now() + 86400000).toISOString().substring(0, 10) + 'T00:00:00'
-			// URLs
-			const tideUrl = encodeURI(
-				'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-A0021-001?Authorization=' +
-					process.env.TAIWAN_OPENDATA_TOKEN +
-					'&locationName=' +
-					locationName +
-					'&elementName=&sort=dataTime&timeFrom=' +
-					today +
-					'&timeTo=' +
-					nextDay
-			)
-			const weatherUrl = encodeURI(
-				`https://api.openweathermap.org/data/2.5/weather?lat=${locationLat}&lon=${LocationLon}&appid=${process.env.OPENWEATHER_TOKEN}`
-			)
-			const waveRul = encodeURI(
-				`https://api.stormglass.io/v2/weather/point?lat=${locationLat}&lng=${LocationLon}&params=waveHeight,waveDirection,waterTemperature,currentDirection,currentSpeed,cloudCover&start=${timeNow}&end=${timeNextHr}`
-			)
+db.once('open', async () => {
+	try {
+		const locationName = locations[0].alias
+		const locationLon = locations[0].lon
+		const locationLat = locations[0].lat
+		let locationLatLon = [locationLat, locationLon]
+		const fields = [
+			'precipitationIntensity',
+			'precipitationProbability',
+			'humidity',
+			'windSpeed',
+			'windDirection',
+			'temperature',
+			'cloudCover',
+			'weatherCode'
+		]
+		const units = 'imperial'
+		const timesteps = ['1h']
+		const timezone = 'Asia/Taipei'
+		let now = moment.utc()
+		const startTime = moment.utc(now).add(0, 'minutes').toISOString()
+		const endTime = moment.utc(now).add(1, 'days').toISOString()
+		const getQueryParameters = queryString.stringify(
+			{
+				apikey,
+				location: locationLatLon,
+				fields,
+				units,
+				timesteps,
+				startTime,
+				endTime,
+				timezone
+			},
+			{ arrayFormat: 'comma' }
+		)
+		const result = await fetch(getTimelineURL + '?' + getQueryParameters, {
+			method: 'GET',
+			compress: true
+		})
+		const data = await result.json()
 
-			return Promise.all([
-				axios.get(tideUrl),
-				axios.get(weatherUrl),
-				axios.get(waveRul, { headers: { Authorization: process.env.WAVE_API_TOKEN } })
-			])
-				.then(([tideData, weatherData, waveData]) => {
-					const result = genResult(tideData, weatherData, waveData, location.name, today)
-					return result
-				})
-				.then(result => {
-					return Weather.create({
-						time: result.time,
-						location: result.location,
-						lat: locationLat,
-						lon: LocationLon,
-						tideChanging: result.tideChanging,
-						waterTemperature: result.waterTemperature,
-						waveHeight: result.waveHeight,
-						waveDirection: result.waveDirection,
-						currentSpeed: result.currentSpeed,
-						currentDirection: result.currentDirection,
-						tideDifference: result.tideDifference,
-						temperature: result.temperature,
-						humidity: result.humidity,
-						rain: result.rain,
-						wind: result.wind,
-						cloudCover: result.cloudCover
-					})
-				})
+		await Weather.create({
+			location: locationName,
+			date: startTime,
+			data: data.data.timelines[0].intervals
 		})
-	)
-		.then(() => {
-			console.log('update done.')
-			process.exit()
-		})
-		.catch(error => console.log(error))
+		console.log('done')
+		process.exit()
+	} catch (error) {
+		console.log(error)
+	}
 })
